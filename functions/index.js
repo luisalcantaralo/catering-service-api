@@ -8,8 +8,8 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extendend: true }));
 
-// const api = require('./api');
-// app.use('/api', api);
+const api = require('./api');
+app.use('/api', api);
 
 app.get('/hello', (req, res, next) => {
   res.status(400).json({ message: 'Hello World from Firebase Cloud Functions!'});
