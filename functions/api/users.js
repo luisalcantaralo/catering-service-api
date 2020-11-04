@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 const verifyIfOneIsOne = (req, res, next) => {
-  if (1 == 1){
+  const a = 1;
+  if (a === 1){
     next();
   } else {  
     return res.status(500).json({ message: 'Not implemented!'});
   }
-  
+  return;
 }
 
 // Read some
