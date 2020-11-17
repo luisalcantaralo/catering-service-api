@@ -11,8 +11,8 @@ app.use(bodyParser.urlencoded({ extendend: true }));
 const api = require('./api');
 app.use('/api', api);
 
-app.get('/hello', (req, res, next) => {
-  res.status(400).json({ message: 'Hello World from Firebase Cloud Functions!'});
+app.use((error, req, res, next) => {
+  res.status(error.status).json({ message: error.message });
   return;
 })
 
