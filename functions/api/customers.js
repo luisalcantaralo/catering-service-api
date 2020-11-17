@@ -4,14 +4,13 @@ const {connectionData} = require('../config/db');
 const { Client } = require('pg');
 
 
-// Read some
+// Done testing
 router.get('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
     
     try {
         const data = await client.query('SELECT * FROM customers');
-        console.log(data.rows) ;
         res.status(200).json({ message: data.rows});
 
     } catch (error) {
@@ -22,16 +21,15 @@ router.get('/', async(req, res, next) => {
    
 });
 
-// Read one
+// Done testing
 router.get('/:id', async(req, res, next) => {
     const {id} = req.params;
-    console.log(req.params);
+    console.log(id);
     const client = new Client(connectionData)
     client.connect();
     try {
         const paramsQuery = [id]; 
         const data = await client.query('SELECT * FROM orders WHERE customer_id = $1', paramsQuery);
-        console.log(data.rows) ;
         res.status(200).json({ message: data.rows});
 
     } catch (error) {
@@ -41,19 +39,20 @@ router.get('/:id', async(req, res, next) => {
     }
 });
 
-// Create one
+// Done testing
 router.post('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { first_name, last_name, email, phone, address_id} = req.params;
+    const { first_name, last_name, email, phone, street, city, county, state, zip_code} = req.body;
     try {
-        const paramsQuery = [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]; 
-        const data = await client.query('INSERT INTO customers (first_name, last_name, email, phone, address_id) VALUES($1, $2, $3, $4, $5)', paramsQuery);
-        console.log(data.rows) ;
-        res.status(200).json({ data: data.rows, message: "Successful inserting item"});
+        var data = await client.query('INSERT INTO addresses (street, city, county, state, zip_code) VALUES($1, $2, $3, $4, $5) RETURNING *', [street, city, county, state, zip_code]);
+        const address_id = "" + data.rows[0]["address_id"];
+
+        data = await client.query('INSERT INTO customers (first_name, last_name, email, phone, address_id) VALUES($1, $2, $3, $4, $5) RETURNING *', [first_name, last_name, email, phone, address_id]);
+        console.log(data.rows);
+        res.status(200).json({ data: data.rows, message: "Successful inserting customer"});
 
     } catch (error) {
-        console.log(error);
         res.status(400).json({ message: "Error with query", error: error});
         
     } finally{
@@ -61,19 +60,18 @@ router.post('/', async(req, res, next) => {
     }
 });
 
-// Update one
+// Done testing
 router.put('/:id', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { customer_id, first_name, last_name, email, phone, address_id} = req.params;
+    const {id} = req.params;
+    const {first_name, last_name, email, phone} = req.body;
     try {
-        const paramsQuery = [customer_id, first_name, last_name, email, phone, address_id]; 
-        const data = await client.query('UPDATE customers SET first_name = $2, last_name = $3, email = $4, phone = $5, address_id= $6, WHERE order_id = $1', paramsQuery);
+        const data = await client.query('UPDATE customers SET first_name = $2, last_name = $3, email = $4, phone = $5 WHERE customer_id = $1', [id, first_name, last_name, email, phone]);
         console.log(data.rows) ;
         res.status(200).json({ data: data.rows, message: "Successful updating item"});
 
     } catch (error) {
-        console.log(error);
         res.status(400).json({ message: "Error with query", error: error});
         
     } finally{
@@ -81,14 +79,14 @@ router.put('/:id', async(req, res, next) => {
     }
 });
 
-// Delete one
+// Not tested yet
 router.delete('/:id', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const {order_id} = req.params;
+    const {id} = req.params;
     try {
         const paramsQuery = [customer_id]; 
-        const data = await client.query('DELETE FROM customers WHERE customer_id = $1', paramsQuery);
+        const data = await client.query(`DELETE FROM customers WHERE customer_id = ${id}`);
         console.log(data.rows) ;
         res.status(200).json({ message: "Successful deleting item", data: data.rows});
 
