@@ -61,6 +61,34 @@ router.post('/', async(req, res, next) => {
     }
 });
 
+// Not tested
+router.post('/newCustomer', async(req, res, next) => {
+    const client = new Client(connectionData)
+    client.connect();
+    const { first_name, last_name, email, phone, street, city, county, state, zip_code, order_date, order_event, recurring, order_notes, total_price, amount_paid} = req.body;
+    try {
+        var data = await client.query('INSERT INTO addresses (street, city, county, state, zip_code) VALUES($1, $2, $3, $4, $5) RETURNING *', [street, city, county, state, zip_code]);
+        const address_id = "" + data.rows[0]["address_id"];
+
+        data = await client.query('INSERT INTO customers (first_name, last_name, email, phone, address_id) VALUES($1, $2, $3, $4, $5) RETURNING *', [first_name, last_name, email, phone, address_id]);
+        console.log(data.rows);
+        res.status(200).json({ data: data.rows, message: "Successful inserting customer"});
+
+        const customer_id = "" + data.rows[0]["customer_id"];
+        data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
+
+        console.log(data.rows) ;
+        res.status(200).json({ data: data.rows, message: "Successful inserting item"});
+
+
+    } catch (error) {
+        res.status(400).json({ message: "Error with query", error: error});
+        
+    } finally{
+        client.end();
+    }
+});
+
 // Done testing
 router.put('/:id', async(req, res, next) => {
     const client = new Client(connectionData)
