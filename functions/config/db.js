@@ -9,7 +9,6 @@ const connectionData = {
 }
 
 const client = new Client(connectionData)
-client.connect();
 
 const checkConnection = (client) =>  (req, res, next) => {
   if (client.ended) {
@@ -18,4 +17,4 @@ const checkConnection = (client) =>  (req, res, next) => {
   next()
 }
 
-module.exports = {client, checkConnection};
+module.exports = {connectionData};
