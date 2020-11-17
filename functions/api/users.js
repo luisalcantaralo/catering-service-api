@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../config/db');
 
 const verifyIfOneIsOne = (req, res, next) => {
   const a = 1;
@@ -12,13 +13,17 @@ const verifyIfOneIsOne = (req, res, next) => {
 }
 
 // Read some
-router.get('/', verifyIfOneIsOne, (req, res, next) => {
-  const users = [{name: 'Jordan'}, {name: 'Joaquin'}, {name: 'Luis'}]
-  if (!users.length) {
-    res.status(400).json({ success: false, message: 'No users in the db!'});
-    return;
+router.get('/', verifyIfOneIsOne, async (req, res, next) => {
+  try {
+    const data = await db.query('SELECT * FROM orders');
+    console.log(data.rows) ;
+    res.status(200).json({ users: data.rows});
+
+  } catch (error) {
+      
+  } finally{
+      db.end();
   }
-  return res.status(200).json({ success: true, users: users});
 });
 
 // Read one

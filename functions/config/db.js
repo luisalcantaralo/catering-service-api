@@ -11,8 +11,6 @@ const connectionData = {
 }
 
 const client = new Client(connectionData)
-client.connect()
+client.connect();
 
-module.exports = {
-  client
-}
+module.exports = client;
