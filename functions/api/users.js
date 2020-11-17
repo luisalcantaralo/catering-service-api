@@ -27,8 +27,19 @@ router.get('/', verifyIfOneIsOne, async (req, res, next) => {
 });
 
 // Read one
-router.get('/:id', (req, res, next) => {
-  
+router.get('/:id', async(req, res, next) => {
+  const {id} = req.params;
+    try {
+        const paramsQuery = [id]; 
+        const data = await db.query('SELECT * FROM users WHERE user_id = %1', paramsQuery);
+        console.log(data.rows) ;
+        res.status(200).json({ user: data.rows});
+
+    } catch (error) {
+        
+    } finally{
+        db.end();
+    }
 });
 
 // Create one
