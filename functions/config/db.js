@@ -13,4 +13,11 @@ const connectionData = {
 const client = new Client(connectionData)
 client.connect();
 
-module.exports = client;
+const checkConnection = (client) =>  (req, res, next) => {
+  if (client.ended) {
+    client.connect();
+  } 
+  next()
+}
+
+module.exports = {client, checkConnection};
