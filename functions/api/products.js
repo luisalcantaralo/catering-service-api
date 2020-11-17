@@ -5,19 +5,17 @@ const { Client } = require('pg');
 
 // Done testing
 router.get('/', async(req, res, next) => {
-    const client = new Client(connectionData)
-    client.connect();
-    
-    try {
-        const data = await client.query('SELECT * FROM products');
-        res.status(200).json({ message: data.rows});
-
-    } catch (error) {
-        next({status: 500, message: error.stack});
-    } finally{
-        client.end();
-    }
-   
+  const client = new Client(connectionData)
+  client.connect();
+  
+  try {
+    const data = await client.query('SELECT * FROM products');
+    res.status(200).json({ products: data.rows});
+  } catch (error) {
+    next({status: 500, message: error.stack});
+  } finally{
+    client.end();
+  } 
 });
 
 

@@ -3,22 +3,20 @@ const router = express.Router();
 const {connectionData} = require('../config/db');
 const { Client } = require('pg');
 
-
 // Done testing
 router.get('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
     
     try {
-        const data = await client.query('SELECT * FROM customers');
-        res.status(200).json({ message: data.rows});
+        const data = await client.query('SELECT * FROM customers as c INNER JOIN addresses as a ON c.address_id = a.address_id');
+        res.status(200).json({ customers: data.rows});
 
     } catch (error) {
         next({status: 500, message: error.stack});
     } finally{
         client.end();
     }
-   
 });
 
 // Done testing
@@ -30,7 +28,7 @@ router.get('/:id', async(req, res, next) => {
     try {
         const paramsQuery = [id]; 
         const data = await client.query('SELECT * FROM orders WHERE customer_id = $1', paramsQuery);
-        res.status(200).json({ message: data.rows});
+        res.status(200).json({ customer: data.rows});
 
     } catch (error) {
         next({status: 500, message: error.stack});
@@ -49,7 +47,6 @@ router.post('/', async(req, res, next) => {
         const address_id = "" + data.rows[0]["address_id"];
 
         data = await client.query('INSERT INTO customers (first_name, last_name, email, phone, address_id) VALUES($1, $2, $3, $4, $5) RETURNING *', [first_name, last_name, email, phone, address_id]);
-        console.log(data.rows);
         res.status(200).json({ data: data.rows, message: "Successful inserting customer"});
 
     } catch (error) {
@@ -85,8 +82,7 @@ router.delete('/:id', async(req, res, next) => {
     client.connect();
     const {id} = req.params;
     try {
-        const paramsQuery = [customer_id]; 
-        const data = await client.query(`DELETE FROM customers WHERE customer_id = ${id}`);
+        const data = await client.query(`DELETE FROM customers WHERE customer_id = $1`, [id]);
         console.log(data.rows) ;
         res.status(200).json({ message: "Successful deleting item", data: data.rows});
 

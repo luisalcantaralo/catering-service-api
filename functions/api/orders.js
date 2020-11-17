@@ -11,9 +11,8 @@ router.get('/',async (req, res, next) => {
     client.connect();
     
     try {
-        const data = await client.query('SELECT * FROM orders');
-        console.log(data.rows) ;
-        res.status(200).json({ message: data.rows});
+        const data = await client.query('SELECT * FROM order_info');
+        res.status(200).json({ orders: data.rows});
 
     } catch (error) {
         next({status: 500, message: error.stack});
