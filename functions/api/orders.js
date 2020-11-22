@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {connectionData} = require('../config/db');
 const { Client } = require('pg');
+const pgFormat = require('pg-format'); //Needed for inserting multiple rows at once
+
 
 
 
@@ -41,15 +43,28 @@ router.get('/:id',async(req, res, next) => {
     }
 });
 
-// Done testing
+//Not tested
 router.post('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid} = req.body;
+    const { customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid, products} = req.body;
+    
+    
     try {
-        const data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
+        var data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
         console.log(data.rows) ;
+        const order_id = "" + data.rows[0]["order_id"];
         res.status(200).json({ data: data.rows, message: "Successful inserting item"});
+
+
+        var queryParameters = [];
+        for (var i=0; i<products.length; ++i){
+          queryParameters.push([order_id, products[i]["product_id"], products[i]["amount"], products[i]["price"]])
+        }
+
+        var query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
+        data = await client.query(query);
+
 
     } catch (error) {
         console.log(error);
