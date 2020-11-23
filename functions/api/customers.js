@@ -3,7 +3,7 @@ const router = express.Router();
 const {connectionData} = require('../config/db');
 const { Client } = require('pg');
 
-// Done testing
+// GET all customers
 router.get('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
@@ -19,7 +19,7 @@ router.get('/', async(req, res, next) => {
     }
 });
 
-// Done testing
+// GET an specific customer given its id
 router.get('/:id', async(req, res, next) => {
     const {id} = req.params;
     console.log(id);
@@ -37,7 +37,7 @@ router.get('/:id', async(req, res, next) => {
     }
 });
 
-// Done testing
+// POST, create a customer
 router.post('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
@@ -57,7 +57,7 @@ router.post('/', async(req, res, next) => {
     }
 });
 
-// Done testing
+// PUT, edit an specific customer given its id
 router.put('/:id', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
@@ -76,25 +76,20 @@ router.put('/:id', async(req, res, next) => {
     }
 });
 
-// Not tested yet
+// DELETE a customer given its id
 router.delete('/:id', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
     const {id} = req.params;
     try {
         const data = await client.query(`DELETE FROM customers WHERE customer_id = $1`, [id]);
-        console.log(data.rows) ;
         res.status(200).json({ message: "Successful deleting item", data: data.rows});
-
     } catch (error) {
         console.log(error);
         res.status(400).json({ message: "Error with query", error: error});
-        
     } finally{
         client.end();
     }
 });
-
-
 
 module.exports = router;
