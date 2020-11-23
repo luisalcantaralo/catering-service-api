@@ -46,7 +46,7 @@ router.post('/', async(req, res, next) => {
     const { first_name, last_name, email, phone, street, city, county, state, zip_code} = req.body;
     try {
         var data = await client.query('INSERT INTO addresses (street, city, county, state, zip_code) VALUES($1, $2, $3, $4, $5) RETURNING *', [street, city, county, state, zip_code]);
-        const address_id = "" + data.rows[0]["address_id"];
+        const address_id = String(data.rows[0]["address_id"]);
 
         data = await client.query('INSERT INTO customers (first_name, last_name, email, phone, address_id) VALUES($1, $2, $3, $4, $5) RETURNING *', [first_name, last_name, email, phone, address_id]);
         console.log(data.rows);
