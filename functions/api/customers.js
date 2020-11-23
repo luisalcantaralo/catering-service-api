@@ -19,6 +19,38 @@ router.get('/', async(req, res, next) => {
     }
 });
 
+// GET all customers
+router.get('/', async(req, res, next) => {
+    const client = new Client(connectionData)
+    client.connect();
+    
+    try {
+        const data = await client.query('SELECT * FROM customers as c INNER JOIN addresses as a ON c.address_id = a.address_id');
+        res.status(200).json({ customers: data.rows});
+
+    } catch (error) {
+        next({status: 500, message: error.stack});
+    } finally{
+        client.end();
+    }
+});
+
+// GET all customers and their orders
+router.get('/orders', async(req, res, next) => {
+    const client = new Client(connectionData)
+    client.connect();
+    
+    try {
+        const data = await client.query('SELECT * FROM customer_orders');
+        res.status(200).json({ customers: data.rows});
+
+    } catch (error) {
+        next({status: 500, message: error.stack});
+    } finally{
+        client.end();
+    }
+});
+
 // GET an specific customer given its id
 router.get('/:id', async(req, res, next) => {
     const {id} = req.params;
