@@ -20,6 +20,7 @@
     "firebase-functions": "^3.6.1",
     "nodemon": "^2.0.6",
     "pg": "^8.5.1",
+    "pg-format": "^1.0.4",
     "pg-promise": "^10.7.5"
   },
   "devDependencies": {
