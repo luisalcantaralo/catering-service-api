@@ -3,25 +3,23 @@ const router = express.Router();
 const {connectionData} = require('../config/db');
 const { Client } = require('pg');
 
-// Done testing
+// GET all products 
 router.get('/', async(req, res, next) => {
-    const client = new Client(connectionData)
-    client.connect();
-    
-    try {
-        const data = await client.query('SELECT * FROM products');
-        res.status(200).json({ message: data.rows});
-
-    } catch (error) {
-        next({status: 500, message: error.stack});
-    } finally{
-        client.end();
-    }
-   
+  const client = new Client(connectionData)
+  client.connect();
+  
+  try {
+    const data = await client.query('SELECT * FROM products');
+    res.status(200).json({ products: data.rows});
+  } catch (error) {
+    next({status: 500, message: error.stack});
+  } finally{
+    client.end();
+  } 
 });
 
 
-// Done testing
+// GET a single product given its id
 router.get('/:id',async(req, res, next) => {
     const {id} = req.params;
     console.log(req.params);
@@ -40,13 +38,13 @@ router.get('/:id',async(req, res, next) => {
     }
 });
 
-// Done testing
+// POST, add a product to the database
 router.post('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { product_name, description, category, price, measure} = req.body;
+    const { product_name, description, category, price, measure, active, filename } = req.body;
     try {
-        var data = await client.query('INSERT INTO products (product_name, description, category, price, measure, active) VALUES($1, $2, $3, $4, $5, true) RETURNING *', [product_name, description, category, price, measure]);
+        var data = await client.query('INSERT INTO products (product_name, description, category, price, measure, active, filename) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [product_name, description, category, price, measure, active, filename]);
 
         console.log(data.rows);
         res.status(200).json({ data: data.rows, message: "Successful inserting product"});
