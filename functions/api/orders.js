@@ -49,6 +49,7 @@ router.post('/', async(req, res, next) => {
     client.connect();
     const { customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid, products} = req.body;
     
+    console.log("products",products);
     
     try {
         var data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
@@ -59,7 +60,11 @@ router.post('/', async(req, res, next) => {
 
         var queryParameters = [];
         for (var i=0; i<products.length; ++i){
-          queryParameters.push([order_id, products[i]["product_id"], products[i]["amount"], products[i]["price"]])
+
+          var price = await client.query('SELECT price FROM products WHERE product_id = $1', [products[i]["id"]]);
+          price = price.rows[0]["price"];
+
+          queryParameters.push([order_id, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
         }
 
         var query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
@@ -95,8 +100,12 @@ router.post('/newCustomer', async(req, res, next) => {
 
         var queryParameters = [];
         for (var i=0; i<products.length; ++i){
-          queryParameters.push([order_id, products[i]["product_id"], products[i]["amount"], products[i]["price"]])
-        }
+
+            var price = await client.query('SELECT price FROM products WHERE product_id = $1', [products[i]["id"]]);
+            price = price.rows[0]["price"];
+  
+            queryParameters.push([order_id, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
+          }
 
         var query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
         data = await client.query(query);
