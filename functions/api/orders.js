@@ -5,8 +5,6 @@ const { Client } = require('pg');
 const pgFormat = require('pg-format'); //Needed for inserting multiple rows at once
 
 
-
-
 // Done testing
 router.get('/',async (req, res, next) => {
     const client = new Client(connectionData)
