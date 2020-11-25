@@ -5,7 +5,13 @@ const { Client } = require('pg');
 const pgFormat = require('pg-format'); //Needed for inserting multiple rows at once
 
 
+<<<<<<< HEAD
 // Done testing
+=======
+
+
+// GETs all orders with customer info and products
+>>>>>>> fbfa4eaffa13fb9a69b25e33fd2a2c53b1045c3a
 router.get('/',async (req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
@@ -22,7 +28,7 @@ router.get('/',async (req, res, next) => {
    
 });
 
-// Done testing
+// GETs specific order info (no client info)
 router.get('/:id',async(req, res, next) => {
     const {id} = req.params;
     console.log(req.params);
@@ -41,12 +47,13 @@ router.get('/:id',async(req, res, next) => {
     }
 });
 
-//Not tested
+//POST to order and all products to order_product
 router.post('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
     const { customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid, products} = req.body;
     
+    console.log("products",products);
     
     try {
         var data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
@@ -57,7 +64,11 @@ router.post('/', async(req, res, next) => {
 
         var queryParameters = [];
         for (var i=0; i<products.length; ++i){
-          queryParameters.push([order_id, products[i]["product_id"], products[i]["amount"], products[i]["price"]])
+
+          var price = await client.query('SELECT price FROM products WHERE product_id = $1', [products[i]["id"]]);
+          price = price.rows[0]["price"];
+
+          queryParameters.push([order_id, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
         }
 
         var query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
@@ -73,7 +84,7 @@ router.post('/', async(req, res, next) => {
     }
 });
 
-// Not tested
+// Not tested, POSTs new customer info along with order
 router.post('/newCustomer', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
@@ -89,6 +100,20 @@ router.post('/newCustomer', async(req, res, next) => {
         const customer_id = String(data.rows[0]["customer_id"]);
         data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
 
+        const order_id = "" + data.rows[0]["order_id"];
+
+        var queryParameters = [];
+        for (var i=0; i<products.length; ++i){
+
+            var price = await client.query('SELECT price FROM products WHERE product_id = $1', [products[i]["id"]]);
+            price = price.rows[0]["price"];
+  
+            queryParameters.push([order_id, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
+          }
+
+        var query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
+        data = await client.query(query);
+
         console.log(data.rows) ;
         res.status(200).json({ data: data.rows, message: "Successful inserting item"});
 
@@ -101,7 +126,7 @@ router.post('/newCustomer', async(req, res, next) => {
     }
 });
 
-// Done testing
+// Updates order
 router.put('/:id', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
@@ -121,7 +146,7 @@ router.put('/:id', async(req, res, next) => {
     }
 });
 
-// Done testing
+// Deletes order
 router.delete('/:id', async (req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
