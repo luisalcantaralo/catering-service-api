@@ -61,13 +61,17 @@ router.post('/', async(req, res, next) => {
           price = price.rows[0]["price"];
 
           total_price += parseFloat(price) * parseFloat(products[i]["quantity"]);
-          queryParameters.push([order_id, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
+          queryParameters.push([0, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
         }
 
         var data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
         console.log(data.rows) ;
         const order_id = "" + data.rows[0]["order_id"];
         res.status(200).json({ data: data.rows, message: "Successful inserting item"});
+
+        for (var i=0; i<queryParameters.length; ++i){
+            queryParameters[i][0] = order_id
+        }
 
         var query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
         data = await client.query(query);
@@ -97,7 +101,7 @@ router.post('/newCustomer', async(req, res, next) => {
             price = price.rows[0]["price"];
   
             total_price += parseFloat(price) * parseFloat(products[i]["quantity"]);
-            queryParameters.push([order_id, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
+            queryParameters.push([0, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
           }
 
         var data = await client.query('INSERT INTO addresses (street, city, county, state, zip_code) VALUES($1, $2, $3, $4, $5) RETURNING *', [street, city, county, state, zip_code]);
@@ -111,6 +115,10 @@ router.post('/newCustomer', async(req, res, next) => {
         data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
 
         const order_id = "" + data.rows[0]["order_id"];
+
+        for (var i=0; i<queryParameters.length; ++i){
+            queryParameters[i][0] = order_id
+        }
 
         var query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
         data = await client.query(query);
