@@ -5,13 +5,10 @@ const { Client } = require('pg');
 const pgFormat = require('pg-format'); //Needed for inserting multiple rows at once
 
 
-<<<<<<< HEAD
 // Done testing
-=======
 
 
 // GETs all orders with customer info and products
->>>>>>> fbfa4eaffa13fb9a69b25e33fd2a2c53b1045c3a
 router.get('/',async (req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
