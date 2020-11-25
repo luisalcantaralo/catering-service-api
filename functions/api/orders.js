@@ -90,7 +90,7 @@ router.post('/', async(req, res, next) => {
 router.post('/newCustomer', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { first_name, last_name, email, phone, street, city, county, state, zip_code, order_date, order_event, recurring, order_notes, amount_paid} = req.body;
+    const { first_name, last_name, email, phone, street, city, county, state, zip_code, order_date, order_event, recurring, order_notes, amount_paid, products} = req.body;
     try {
 
         var total_price = 0;
