@@ -19,16 +19,14 @@ router.get('/', async(req, res, next) => {
     }
 });
 
-router.get('/verify', async(req, res, next) => {
-    console.log("here");
+router.get('/verify/:email', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
 
-    const {email} = req.body;
+    const {email} = req.params;
     
     try {
         const data = await client.query('SELECT customer_id FROM customers where email = $1', [email]);
-        console.log(data.rows);
         if(data.rows.length == 0) res.status(200).json({customer_id: -1});
         res.status(200).json(data.rows[0]);
 
