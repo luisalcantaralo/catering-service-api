@@ -19,6 +19,25 @@ router.get('/', async(req, res, next) => {
     }
 });
 
+router.get('/verify', async(req, res, next) => {
+    console.log("here");
+    const client = new Client(connectionData)
+    client.connect();
+
+    const {email} = req.body;
+    
+    try {
+        const data = await client.query('SELECT customer_id FROM customers where email = $1', [email]);
+        console.log(data.rows);
+        res.status(200).json(data.rows[0]);
+
+    } catch (error) {
+        next({status: 500, message: error.stack});
+    } finally{
+        client.end();
+    }
+});
+
 // GET all customers
 router.get('/', async(req, res, next) => {
     const client = new Client(connectionData)
