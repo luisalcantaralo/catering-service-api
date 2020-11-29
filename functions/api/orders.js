@@ -103,25 +103,15 @@ router.post('/newCustomer', async(req, res, next) => {
             queryParameters.push([0, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
           }
 
-<<<<<<< HEAD
-        var data = await client.query('INSERT INTO addresses (street, city, county, state, zip_code) VALUES($1, $2, $3, $4, $5) RETURNING *', [street, city, county, state, zip_code]);
-        const address_id = String(data.rows[0]["address_id"]);
-=======
         let data = await client.query('INSERT INTO addresses (street, city, county, state, zip_code) VALUES($1, $2, $3, $4, $5) RETURNING *', [street, city, county, state, zip_code]);
         const address_id = "" + data.rows[0]["address_id"];
->>>>>>> bb55d34e7df2c6ee7752bec1a71fb7425fe6db54
 
         data = await client.query('INSERT INTO customers (first_name, last_name, email, phone, address_id) VALUES($1, $2, $3, $4, $5) RETURNING *', [first_name, last_name, email, phone, address_id]);
         console.log(data.rows);
         res.status(200).json({ data: data.rows, message: "Successful inserting customer"});
 
-<<<<<<< HEAD
         const customer_id = String(data.rows[0]["customer_id"]);
         data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
-=======
-        const customer_id = "" + data.rows[0]["customer_id"];
-        data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, date, order_event, recurring, order_notes, total_price, amount_paid]);
->>>>>>> bb55d34e7df2c6ee7752bec1a71fb7425fe6db54
 
         const order_id = "" + data.rows[0]["order_id"];
 
