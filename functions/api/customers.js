@@ -29,6 +29,7 @@ router.get('/verify', async(req, res, next) => {
     try {
         const data = await client.query('SELECT customer_id FROM customers where email = $1', [email]);
         console.log(data.rows);
+        if(data.rows.length == 0) res.status(200).json({customer_id: -1});
         res.status(200).json(data.rows[0]);
 
     } catch (error) {
