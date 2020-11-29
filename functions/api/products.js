@@ -45,7 +45,6 @@ router.post('/', async(req, res, next) => {
     const { product_name, description, category, price, measure, active, filename } = req.body;
     try {
         var data = await client.query('INSERT INTO products (product_name, description, category, price, measure, active, filename) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [product_name, description, category, price, measure, active, filename]);
-
         console.log(data.rows);
         res.status(200).json({ data: data.rows, message: "Successful inserting product"});
 
@@ -57,14 +56,14 @@ router.post('/', async(req, res, next) => {
     }
 });
 
-// Done testing
+// PUT, update a product given its id
 router.put('/:id', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
     const {id} = req.params;
-    const {product_name, description, category, price, measure} = req.body;
+    const {product_name, description, category, price, measure, active, filename} = req.body;
     try {
-        const data = await client.query('UPDATE products SET product_name = $2, description = $3, category = $4, price = $5, measure = $6 WHERE product_id = $1', [id, product_name, description, category, price, measure]);
+        const data = await client.query('UPDATE products SET product_name = $2, description = $3, category = $4, price = $5, measure = $6, active = $7, filename = $8 WHERE product_id = $1', [id, product_name, description, category, price, measure, active, filename]);
         console.log(data.rows) ;
         res.status(200).json({ data: data.rows, message: "Successful updating product"});
 

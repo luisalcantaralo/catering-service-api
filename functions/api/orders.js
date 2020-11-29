@@ -48,35 +48,32 @@ router.get('/:id',async(req, res, next) => {
 router.post('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { customer_id, order_date, order_event, recurring, order_notes, amount_paid, products} = req.body;
-    
-    console.log("products",products);
-    
+    const { customer_id, order_date, order_time, order_event, recurring, order_notes, amount_paid, products} = req.body;
+    const date = order_date + ' ' + order_time + ':00+00'
     try {
 
-        var total_price = 0;
-        var queryParameters = [];
-        for (var i=0; i<products.length; ++i){
+        let total_price = 0;
+        let queryParameters = [];
+        for (let i=0; i<products.length; ++i){
 
-          var price = await client.query('SELECT price FROM products WHERE product_id = $1', [products[i]["id"]]);
+          let price = await client.query('SELECT price FROM products WHERE product_id = $1', [products[i]["id"]]);
           price = price.rows[0]["price"];
 
           total_price += parseFloat(price) * parseFloat(products[i]["quantity"]);
           queryParameters.push([0, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
         }
 
-        var data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
-        console.log(data.rows) ;
+        let data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, date, order_event, recurring, order_notes, total_price, amount_paid]);
         const order_id = "" + data.rows[0]["order_id"];
-        res.status(200).json({ data: data.rows, message: "Successful inserting item"});
 
-        for (var i=0; i<queryParameters.length; ++i){
+        for (let i=0; i<queryParameters.length; ++i){
             queryParameters[i][0] = order_id
         }
 
-        var query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
-        data = await client.query(query);
+        let query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
+        await client.query(query);
 
+        res.status(200).json({ data: data.rows, message: "Successful inserting item"});
 
     } catch (error) {
         console.log(error);
@@ -91,37 +88,48 @@ router.post('/', async(req, res, next) => {
 router.post('/newCustomer', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { first_name, last_name, email, phone, street, city, county, state, zip_code, order_date, order_event, recurring, order_notes, amount_paid} = req.body;
+    const { first_name, last_name, email, phone, street, city, county, state, zip_code, order_date, order_time, order_event, recurring, order_notes, amount_paid} = req.body;
+    const date = order_date + ' ' + order_time + ':00+00'
     try {
 
-        var total_price = 0;
-        var queryParameters = [];
-        for (var i=0; i<products.length; ++i){
+        let total_price = 0;
+        let queryParameters = [];
+        for (let i=0; i<products.length; ++i){
 
-            var price = await client.query('SELECT price FROM products WHERE product_id = $1', [products[i]["id"]]);
+            let price = await client.query('SELECT price FROM products WHERE product_id = $1', [products[i]["id"]]);
             price = price.rows[0]["price"];
   
             total_price += parseFloat(price) * parseFloat(products[i]["quantity"]);
             queryParameters.push([0, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
           }
 
+<<<<<<< HEAD
         var data = await client.query('INSERT INTO addresses (street, city, county, state, zip_code) VALUES($1, $2, $3, $4, $5) RETURNING *', [street, city, county, state, zip_code]);
         const address_id = String(data.rows[0]["address_id"]);
+=======
+        let data = await client.query('INSERT INTO addresses (street, city, county, state, zip_code) VALUES($1, $2, $3, $4, $5) RETURNING *', [street, city, county, state, zip_code]);
+        const address_id = "" + data.rows[0]["address_id"];
+>>>>>>> bb55d34e7df2c6ee7752bec1a71fb7425fe6db54
 
         data = await client.query('INSERT INTO customers (first_name, last_name, email, phone, address_id) VALUES($1, $2, $3, $4, $5) RETURNING *', [first_name, last_name, email, phone, address_id]);
         console.log(data.rows);
         res.status(200).json({ data: data.rows, message: "Successful inserting customer"});
 
+<<<<<<< HEAD
         const customer_id = String(data.rows[0]["customer_id"]);
         data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
+=======
+        const customer_id = "" + data.rows[0]["customer_id"];
+        data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, date, order_event, recurring, order_notes, total_price, amount_paid]);
+>>>>>>> bb55d34e7df2c6ee7752bec1a71fb7425fe6db54
 
         const order_id = "" + data.rows[0]["order_id"];
 
-        for (var i=0; i<queryParameters.length; ++i){
+        for (let i=0; i<queryParameters.length; ++i){
             queryParameters[i][0] = order_id
         }
 
-        var query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
+        let query = pgFormat("INSERT INTO order_product (order_id, product_id, amount, price) VALUES %L", queryParameters);
         data = await client.query(query);
 
         console.log(data.rows) ;
