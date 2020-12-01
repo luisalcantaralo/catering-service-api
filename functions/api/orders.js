@@ -161,6 +161,7 @@ router.delete('/:id', async (req, res, next) => {
     const {id} = req.params;
     try {
         console.log(id);
+        await client.query(`DELETE FROM order_product WHERE order_id = ${id}`);
         const data = await client.query(`DELETE FROM orders WHERE order_id = ${id}`);
         res.status(200).json({ message: "Successful deleting item", data: data.rows});
 
@@ -171,7 +172,5 @@ router.delete('/:id', async (req, res, next) => {
         client.end();
     }
 });
-
-
 
 module.exports = router;
