@@ -33,9 +33,9 @@ router.get('/:id',async(req, res, next) => {
     client.connect();
     try {
         const paramsQuery = [id]; 
-        const data = await client.query('SELECT * FROM orders WHERE order_id = $1', paramsQuery);
-        console.log(data.rows) ;
-        res.status(200).json({ message: data.rows});
+        const data = await client.query('SELECT * FROM order_info WHERE order_id = $1', paramsQuery);
+        let order = data.rows.length > 0 ? data.rows[0] : []
+        res.status(200).json({ order });
 
     } catch (error) {
         next({status: 500, message: error.stack});
