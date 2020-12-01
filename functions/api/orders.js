@@ -139,7 +139,7 @@ router.put('/:id', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
     const {id} = req.params;
-    const {customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid} = req.body;
+    const {customer_id, order_event, recurring, order_notes, total_price, amount_paid} = req.body;
     console.log(req.body);
     try {
         const data = await client.query('UPDATE orders SET customer_id = $2, order_event = $3, recurring = $4, order_notes= $5, total_price= $6, amount_paid = $7 WHERE order_id = $1', [id, customer_id, order_event, recurring, order_notes, total_price, amount_paid]);
