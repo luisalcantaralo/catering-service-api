@@ -63,7 +63,7 @@ router.post('/', async(req, res, next) => {
           queryParameters.push([0, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
         }
 
-        let data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid, amt_people) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, date, order_event, recurring, order_notes, total_price, amount_paid, amt_people]);
+        let data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid, amt_people) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [customer_id, date, order_event, recurring, order_notes, total_price, amount_paid, amt_people]);
         const order_id = "" + data.rows[0]["order_id"];
 
         for (let i=0; i<queryParameters.length; ++i){
