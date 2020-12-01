@@ -48,7 +48,7 @@ router.get('/:id',async(req, res, next) => {
 router.post('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { order_date, order_time, order_event, persons, recurring, order_notes, amount_paid, customer_id, products } = req.body;
+    const { order_date, order_time, order_event, amt_people, recurring, order_notes, amount_paid, customer_id, products } = req.body;
     const date = order_date + ' ' + order_time + ':00+00'
     try {
 
@@ -63,7 +63,7 @@ router.post('/', async(req, res, next) => {
           queryParameters.push([0, products[i]["id"], products[i]["quantity"], parseFloat(price) * parseFloat(products[i]["quantity"])]);
         }
 
-        let data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, date, order_event, recurring, order_notes, total_price, amount_paid]);
+        let data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid, amt_people) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, date, order_event, recurring, order_notes, total_price, amount_paid, amt_people]);
         const order_id = "" + data.rows[0]["order_id"];
 
         for (let i=0; i<queryParameters.length; ++i){
