@@ -88,7 +88,7 @@ router.post('/', async(req, res, next) => {
 router.post('/newCustomer', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { customer_id, first_name, last_name, email, phone, street, city, county, state, zip_code, order_date, order_time, order_event, persons, recurring, order_notes, amount_paid, products } = req.body;
+    const { customer_id, first_name, last_name, email, phone, street, city, county, state, zip_code, order_date, order_time, order_event, persons, recurring, order_notes, amount_paid, products, amt_people } = req.body;
     const date = order_date + ' ' + order_time + ':00+00'
     try {
 
@@ -111,7 +111,7 @@ router.post('/newCustomer', async(req, res, next) => {
         res.status(200).json({ data: data.rows, message: "Successful inserting customer"});
 
         const customer_id = String(data.rows[0]["customer_id"]);
-        data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
+        data = await client.query('INSERT INTO orders (customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid, amt_people) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *', [customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid, amt_people]);
 
         const order_id = "" + data.rows[0]["order_id"];
 
