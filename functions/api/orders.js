@@ -142,7 +142,7 @@ router.put('/:id', async(req, res, next) => {
     const {customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid} = req.body;
     console.log(req.body);
     try {
-        const data = await client.query('UPDATE orders SET customer_id = $2, order_date = $3, order_event = $4, recurring = $5, order_notes= $6, total_price= $7, amount_paid = $8 WHERE order_id = $1', [id, customer_id, order_date, order_event, recurring, order_notes, total_price, amount_paid]);
+        const data = await client.query('UPDATE orders SET customer_id = $2, order_event = $3, recurring = $4, order_notes= $5, total_price= $6, amount_paid = $7 WHERE order_id = $1', [id, customer_id, order_event, recurring, order_notes, total_price, amount_paid]);
         console.log(data.rows) ;
         res.status(200).json({ data: data.rows, message: "Successful updating item"});
 
