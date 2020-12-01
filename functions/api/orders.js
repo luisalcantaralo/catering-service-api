@@ -48,7 +48,7 @@ router.get('/:id',async(req, res, next) => {
 router.post('/', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { customer_id, order_date, order_time, order_event, recurring, order_notes, amount_paid, products} = req.body;
+    const { order_date, order_time, order_event, persons, recurring, order_notes, amount_paid, customer_id, products } = req.body;
     const date = order_date + ' ' + order_time + ':00+00'
     try {
 
@@ -88,7 +88,7 @@ router.post('/', async(req, res, next) => {
 router.post('/newCustomer', async(req, res, next) => {
     const client = new Client(connectionData)
     client.connect();
-    const { first_name, last_name, email, phone, street, city, county, state, zip_code, order_date, order_time, order_event, recurring, order_notes, amount_paid} = req.body;
+    const { customer_id, first_name, last_name, email, phone, street, city, county, state, zip_code, order_date, order_time, order_event, persons, recurring, order_notes, amount_paid, products } = req.body;
     const date = order_date + ' ' + order_time + ':00+00'
     try {
 
